@@ -1,12 +1,13 @@
 '''
 Created on Dec 4, 2015
 This file is to feed the fbo xml to elasticsearch
-Sample Code
-@author: gaob 
+
+@author: gaob
 '''
 import sgmllib
-import cgi, string, sys
+import cgi, string, sys, os
 from org.opefob.entity.Notice import Notice
+from os import walk
 
 class FBOFeeder(sgmllib.SGMLParser):
 
@@ -28,7 +29,7 @@ class FBOFeeder(sgmllib.SGMLParser):
              
     
     def load(self, file):
-        print 'LOAD FILE ...'
+        print 'LOAD FILE ...', file
         while 1:
             s = file.read(8192)
             if not s:
@@ -56,8 +57,20 @@ class FBOFeeder(sgmllib.SGMLParser):
                
     
     
+files = []
+directory_path = "C:/temp/fbo2015/"
+for (dirpath, dirnames, filenames) in walk(directory_path):
+    files.extend(filenames)
+    
+    
+for f in files:
+    print 'loading file ...=>' , f
+    c = FBOFeeder()
+    c.load(open(directory_path + f))
+
+  
+'''
 c = FBOFeeder()
-''' c.load(open("c:/001/python/fbo/PRESOL.txt"))''' 
 c.load(open("c:/001/python/fbo/FBOFeed20160103.xml"))
-   
+'''   
     
