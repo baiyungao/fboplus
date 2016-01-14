@@ -15,7 +15,7 @@ class Notice(object):
     
     '''
     
-    type_set =set(['PRESOL','SRCSGT','COMBINE','ARCHIVE','AWARD','SNOTE'])
+    type_set =set(['PRESOL','SRCSGT','COMBINE','ARCHIVE','AWARD','MOD','SNOTE'])
     
     attribute_set =set(['DATE','YEAR','AGENCY','OFFICE','LOCATION','ZIP','CLASSCOD','NAICS','OFFADD',
                         'SUBJECT','SOLNBR','RESPDATE','CONTACT','DESC','LINK', 'URL','DESC','SETASIDE',
@@ -60,12 +60,19 @@ class Notice(object):
     def isNotice(self):
         return self.content.get('NoticeType') in ['PRESOL','SRCSGT','COMBINE']
     
+    def isMod(self):
+        return self.content.get('NoticeType') == 'MOD'
+     
      
     def complete(self):
         self.post()
         
     
     def post(self):
+        
+        if (self.isMod()):
+            return
+        print self.getID()
         self.polish()
         if (self.isAward()):
             res = Notice.es.index(index="fbo", doc_type='award', id=self.getID(), body=self.content)
@@ -79,7 +86,7 @@ class Notice(object):
         Transformation here, combine the date and year.
         
         '''
-        
+               
         if ((self.content.get('DATE') != None) and (self.content.get('YEAR') != None)):
             try:
                 s_date = '' + self.content.get('DATE'); 

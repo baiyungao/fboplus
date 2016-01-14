@@ -38,15 +38,22 @@ class FBOFeeder(sgmllib.SGMLParser):
         self.close()
         
     def handle_data(self, data):
-       self.currentNotice.addData(data)   
+         try:
+             self.currentNotice.addData(data)   
+         except AttributeError:
+                    pass    
              
     def unknown_starttag(self, tag, attrs):
         tag = string.upper(tag)
         if (tag in Notice.type_set):
             self.currentNotice = Notice(tag)
         else:
-            self.currentNotice.start_tag(tag, attrs)
-            
+            try:
+                if (self.currentNotice != None):
+                    self.currentNotice.start_tag(tag, attrs)
+            except AttributeError:
+                    pass
+                
     def do_tag(self, attrs):
        print 'Do tag:', attrs
     
@@ -58,7 +65,8 @@ class FBOFeeder(sgmllib.SGMLParser):
     
     
 files = []
-directory_path = "C:/temp/fbo2015/"
+directory_path = "C:/fboNotice/"
+completed_path = "C:/fboNoticeLoaded/"
 for (dirpath, dirnames, filenames) in walk(directory_path):
     files.extend(filenames)
     
@@ -67,7 +75,7 @@ for f in files:
     print 'loading file ...=>' , f
     c = FBOFeeder()
     c.load(open(directory_path + f))
-
+    os.rename(directory_path + f, completed_path + f)
   
 '''
 c = FBOFeeder()
